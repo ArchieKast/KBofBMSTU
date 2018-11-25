@@ -1,0 +1,75 @@
+1. Faculties
+
+CREATE TABLE Faculties
+(
+    faculty_name VARCHAR(255) NOT NULL PRIMARY KEY,
+    dean_name VARCHAR(255) NOT NULL,
+    UNIQUE (faculty_name)
+);
+
+2. Departments
+
+CREATE TABLE Departments
+(
+    department_name VARCHAR(255) NOT NULL PRIMARY KEY,
+    faculty_name VARCHAR(255) NOT NULL REFERENCES Faculties(faculty_name) ON UPDATE CASCADE,
+    headofdep_name VARCHAR(255) NOT NULL,
+    UNIQUE (department_name)
+);
+
+3. Groups
+
+CREATE TABLE Groups
+(
+    group_name VARCHAR(255) NOT NULL PRIMARY KEY,
+    department_name VARCHAR(255) NOT NULL REFERENCES Departments(department_name) ON UPDATE CASCADE
+);
+
+4. Teachers
+
+CREATE TABLE Teachers
+(
+    teacher_id SERIAL PRIMARY KEY,
+    teacher_fullname VARCHAR(255) NOT NULL,
+    teacher_email VARCHAR(255),
+    teacher_password VARCHAR(255) NOT NULL,
+    department_name VARCHAR(255) NOT NULL REFERENCES Departments(department_name) ON UPDATE CASCADE,
+    UNIQUE (teacher_fullname),
+    CHECK (length(teacher_password) >= 8)
+);
+
+5. Students
+
+CREATE TABLE Students
+(
+    gradebook VARCHAR(255) NOT NULL PRIMARY KEY,
+    student_fullname VARCHAR(255) NOT NULL,
+    student_email VARCHAR(255),
+    student_password VARCHAR(255) NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    group_name VARCHAR(255) NOT NULL REFERENCES Groups(group_name) ON UPDATE CASCADE,
+    CHECK (length(student_password) >= 8),
+    CHECK (status IN ('Учится', 'В академическом отпуске', 'Окончил', 'Отчислен'))
+);
+
+6. Subjects
+
+CREATE TABLE Subjects
+(
+    subject_name VARCHAR(255) NOT NULL PRIMARY KEY,
+    teacher_fullname VARCHAR(255) NOT NULL REFERENCES Teachers(teacher_fullname) ON UPDATE CASCADE
+);
+
+7. Shedule
+
+CREATE TABLE Shedule
+(
+    group_name VARCHAR(255) NOT NULL REFERENCES Groups(group_name) ON UPDATE CASCADE,
+    subject_name VARCHAR(255) NOT NULL REFERENCES Subjects(subject_name) ON UPDATE CASCADE,
+    weekday VARCHAR(255) NOT NULL,
+    pair_num integer NOT NULL,
+    flasher VARCHAR(255),
+    CHECK (pair_num > 0 AND pair_num <= 7),
+    CHECK (weekday IN ('Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье')),
+    CHECK (flasher IN ('Числитель', 'Знаменатель'))
+);
